@@ -45,8 +45,8 @@ impl<'a> FromSqlText<'a> for bool {
         Self: Sized,
     {
         match input {
-            b"t" => Ok(true),
-            b"f" => Ok(false),
+            b"t" | b"true" => Ok(true),
+            b"f" | b"false" => Ok(false),
             _ => Err("Invalid text value for bool".into()),
         }
     }
@@ -129,7 +129,7 @@ impl<'a> FromSqlText<'a> for SystemTime {
     where
         Self: Sized,
     {
-        let datetime = NaiveDateTime::parse_from_str(to_str(value)?, "%Y-%m-%d %H:%M:%S.6f")?;
+        let datetime = NaiveDateTime::parse_from_str(to_str(value)?, "%Y-%m-%d %H:%M:%S.f")?;
         let system_time =
             UNIX_EPOCH + Duration::from_millis(datetime.and_utc().timestamp_millis() as u64);
 
