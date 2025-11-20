@@ -211,7 +211,15 @@ impl<'a> FromSqlText<'a> for NaiveDateTime {
     where
         Self: Sized,
     {
-        let datetime = NaiveDateTime::parse_from_str(to_str(value)?, "%Y-%m-%d %H:%M:%S")?;
+        let value_str = to_str(value)?;
+
+        // Try parsing with milliseconds first
+        if let Ok(datetime) = NaiveDateTime::parse_from_str(value_str, "%Y-%m-%d %H:%M:%S%.f") {
+            return Ok(datetime);
+        }
+
+        // Fallback to parsing without milliseconds
+        let datetime = NaiveDateTime::parse_from_str(value_str, "%Y-%m-%d %H:%M:%S")?;
         Ok(datetime)
     }
 }
